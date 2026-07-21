@@ -75,3 +75,7 @@ modules — see `docs/briefs/0002-quantum-life-structured-refactor/`:
 A module that needs a contract shared across boundaries exports it from `types.ts`
 (`FieldState`); a module whose contract is local to its own output defines it itself
 (`Renderer` in `rendering.ts`, `ScoreResult` in `scoring.ts`).
+
+Unit tests live in `src/tests/` (`engine.test.ts`, `scoring.test.ts`, `state.test.ts`),
+one level below the modules they cover — `vitest` discovers them there without any
+config change.

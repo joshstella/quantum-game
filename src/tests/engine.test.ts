@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createFieldState } from "./state";
-import { applyH, step } from "./engine";
+import { createFieldState } from "../state";
+import { applyH, step } from "../engine";
 
 describe("applyH", () => {
   it("computes the discrete Laplacian with Dirichlet (zero) edges", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clear, createFieldState, seedInterf, seedPacket, seedRing } from "./state";
+import { clear, createFieldState, seedInterf, seedPacket, seedRing } from "../state";
 
 function magAt(R: Float32Array, I: Float32Array, i: number): number {
   return Math.hypot(R[i], I[i]);

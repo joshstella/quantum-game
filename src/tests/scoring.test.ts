@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { FieldState } from "./types";
-import { createFieldState, seedRing } from "./state";
-import { computeScore } from "./scoring";
+import type { FieldState } from "../types";
+import { createFieldState, seedRing } from "../state";
+import { computeScore } from "../scoring";
 
 // A ring with real amplitude but a winding direction that flips at x=0 —
 // present but phase-incoherent, distinct from both "no signal" and "clean winding".
