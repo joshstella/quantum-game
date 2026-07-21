@@ -13,11 +13,18 @@ than a list.
 
 **A chronicle is a derived artifact, not part of the record.** The briefs, ledgers, and
 git history are the system of record; a chronicle is a *rendering* of them — like a report
-run off a database, not a row added to it. So it is generated on demand and read by a
-human; it does **not** get written back into the repo. (It's the first of a possible family
-of derived views — timeline decks, engagement summaries — all rendered from the same
-`gather.sh` digest. Keeping the mechanical-digest → human-rendering split clean is what
-makes the next rendering cheap.)
+run off a database, not a row added to it. (It's the first of a possible family of derived
+views — timeline decks, engagement summaries — all rendered from the same `gather.sh`
+digest. Keeping the mechanical-digest → human-rendering split clean is what makes the next
+rendering cheap.)
+
+**Two copies, two jobs.** The versioned history — one dated `.md` per run, each an
+addendum on the last — lives in the **vault**, outside the tracked repo tree: that's where
+drift-proof, append-only narrative belongs. Alongside it, exactly **one** always-current
+file lives *inside* the repo (`docs/chronicles/<repo>-chronicle.md`, no date suffix): a
+single mirror that always reflects the full story to date, kept in sync on every run. It's
+the one deliberate exception to "not part of the record" — a living doc, not a snapshot,
+and it's on the author to keep it current, same as any other doc that ships with the repo.
 
 ## What it reads
 
@@ -89,18 +96,30 @@ prose; if it is scanned by the next run, the marker is the only machine-readable
    Do not retell prior eras — reference the prior file. Close with the updated "Where I am
    now" coda (it supersedes the prior one).
 
-7. **Write to `.md` file(s)** — the chronicle is a Markdown deliverable. Write to a path
-   the user names, kept **outside the tracked repo tree** (a notes vault, a decks folder, a
-   gitignored output dir) so it never drifts against the record it describes. Multi-part
-   cuts (eras, per-workspace) become several `.md` files. Never commit it into the repo;
-   render inline to the conversation only if the user asks instead of a file.
+7. **Write the vault copy.** The chronicle is a Markdown deliverable. Write the dated
+   run's file to the vault path the user names, kept **outside the tracked repo tree** (a
+   notes vault, a decks folder, a gitignored output dir) — this copy never drifts against
+   the record it describes because it's never mutated after being written. Multi-part cuts
+   (eras, per-workspace) become several `.md` files, same rule.
 
-8. **Append the closed-date marker** as the very last line of every written `.md` file:
+8. **Update the in-repo mirror.** Write/overwrite `docs/chronicles/<repo>-chronicle.md`
+   (tracked, no date suffix) so it reads as one continuous, always-current story:
+   - **Full run:** its contents are exactly the vault file just written.
+   - **Incremental run:** append the new run's narrative (everything after the
+     "continues from…" preamble — skip the preamble itself, since the in-repo file has no
+     gap to bridge) under its own era heading(s) to the existing in-repo file, so the
+     mirror reads seamlessly rather than as a stitched series of addenda.
+   Do not create dated copies in-repo — one file, continuously updated, is the point.
+
+9. **Append the closed-date marker** as the very last line of *both* the vault file and
+   the in-repo mirror:
    ```
    <!-- chronicle:closed-through:YYYY-MM-DD -->
    ```
    `YYYY-MM-DD` is today's date (from the system prompt) — or the date of HEAD if
-   the session date is unavailable. This is what the next run will read.
+   the session date is unavailable. This is what the next run will read (checked against
+   the vault first, per step 1 — the in-repo mirror is kept in lockstep but the vault
+   remains the canonical marker source since it's never touched outside a chronicle run).
 
 ## Voice & structure
 
@@ -122,7 +141,8 @@ prose; if it is scanned by the next run, the marker is the only machine-readable
   an honest account includes what was weighed and set aside.
 - **Close with a brief "current state" coda**, explicitly noting that present *state*
   lives in the design docs and READMEs — the chronicle is how the system got here, not a
-  statement of what's here now.
+  statement of what's here now, regardless of which copy (vault or in-repo mirror) is
+  being read.
 
 ## Grounding rules (non-negotiable)
 
@@ -141,12 +161,14 @@ prose; if it is scanned by the next run, the marker is the only machine-readable
 
 ## Output options
 
-- **One `.md` file** (default) — the full chronicle, written to a user-named path outside
-  the tracked tree.
-- **Several `.md` files** — for era / date-range / per-workspace cuts, one file per part.
-  In a monorepo, chronicle one workspace (`apps/syzygy`) by filtering briefs and git paths
-  to it.
-- **Onboarding cut** — a shorter "how did we get here, for someone joining" `.md`.
+- **Vault + in-repo mirror** (default) — the dated run file in the vault, plus the
+  always-current `docs/chronicles/<repo>-chronicle.md` mirror kept in sync, per steps 7-9.
+- **Several `.md` files** — for era / date-range / per-workspace cuts, one file per part in
+  the vault. In a monorepo, chronicle one workspace (`apps/syzygy`) by filtering briefs and
+  git paths to it; the in-repo mirror for a workspace cut lives at that workspace's own
+  `docs/chronicles/`.
+- **Onboarding cut** — a shorter "how did we get here, for someone joining" `.md`, vault-only
+  (it's a derived excerpt, not the canonical mirror).
 - **Inline** — render to the conversation only if the user asks for it instead of a file.
 
 ## Portability
