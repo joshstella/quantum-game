@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Observers — a quantum field prototype</title>
+<link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+  <div class="stage">
+    <h1>Observers</h1>
+    <p class="sub">Brightness = amplitude · Hue = phase. Watch the field flow, then hold it into shape.</p>
+    <canvas id="view" width="520" height="520"></canvas>
+  </div>
+
+  <div class="panel">
+    <div class="grp">
+      <p class="lbl">Your instrument</p>
+      <div class="row">
+        <button class="mode on" data-mode="observe">Observe · Zeno<small>drag to freeze &amp; hold coherence</small></button>
+        <button class="mode" data-mode="collapse">Collapse<small>click: a hard, destructive look</small></button>
+        <button class="mode" data-mode="source">Source<small>drag to pour in amplitude</small></button>
+        <button class="mode" data-mode="phase">Phase tune<small>drag to rotate hue / align</small></button>
+      </div>
+    </div>
+
+    <div class="grp">
+      <p class="lbl">Field</p>
+      <div class="row">
+        <button data-seed="ring" class="wide">Vortex ring</button>
+        <button data-seed="interf" class="wide">Two sources</button>
+        <button data-seed="packet" class="wide">Moving packet</button>
+      </div>
+      <div class="row" style="margin-top:7px">
+        <button id="play" class="wide">⏸ Pause</button>
+        <button id="release" class="wide">Release holds</button>
+        <button id="clear" class="wide">Clear</button>
+      </div>
+    </div>
+
+    <div class="grp">
+      <div class="slabel"><span>Brush size</span><span id="brVal">6</span></div>
+      <input id="brush" type="range" min="1" max="16" value="6">
+      <div class="slabel"><span>Time speed</span><span id="spVal">3</span></div>
+      <input id="speed" type="range" min="0" max="8" value="3">
+    </div>
+
+    <div class="grp">
+      <p class="lbl">Scoring — target ring</p>
+      <div class="score"><b>Ring coherence</b><span class="val big" id="ringScore" style="color:var(--good)">0%</span></div>
+      <div class="meter"><i id="ringBar"></i></div>
+      <div class="score" style="margin-top:9px"><b>Universe held (Zeno)</b><span class="val" id="heldScore">0%</span></div>
+      <div class="meter"><i id="heldBar"></i></div>
+    </div>
+
+    <div class="grp">
+      <div class="legwrap">
+        <div class="wheel"></div>
+        <p>Colour tells you the <b style="color:#c3cbe0">phase</b> at each point. A coherent geometry reads as smooth, structured colour — noise reads as static.</p>
+      </div>
+    </div>
+
+    <div class="grp">
+      <p class="hint">
+        Try it: hit <b>Vortex ring</b>, watch the coloured ring start to blur as it evolves, then switch to
+        <b>Observe · Zeno</b> and drag around the dashed target to pin the winding in place — the score climbs.
+        Then try one hard <b>Collapse</b> click and watch coherence die where you looked.
+      </p>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
