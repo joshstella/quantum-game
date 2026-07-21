@@ -8,7 +8,7 @@
 | Phase | Files created/modified | Accomplishes | Depends on | Status |
 |---|---|---|---|---|
 | `phase 1 — scaffold` | `package.json`, `tsconfig.json`, `vite.config.ts`, `index.html`, `src/main.ts`, `src/styles.css` | Stand up Vite + TypeScript project; move existing HTML/CSS/JS in as-is, no behavior change, single entry file | — | done (PR [#1](https://github.com/joshstella/quantum-game/pull/1)) |
-| `phase 2 — extract core behavior` | `src/types.ts`, `src/state.ts`, `src/engine.ts`, `src/rendering.ts`, `src/ui.ts` | Split field state, `step`/`applyH`, canvas rendering, and control/UI wiring out of `main.ts` into typed modules | phase 1 scaffold exists | in-progress |
+| `phase 2 — extract core behavior` | `src/types.ts`, `src/state.ts`, `src/engine.ts`, `src/rendering.ts`, `src/ui.ts` | Split field state, `step`/`applyH`, canvas rendering, and control/UI wiring out of `main.ts` into typed modules | phase 1 scaffold exists | done (PR [#2](https://github.com/joshstella/quantum-game/pull/2)) |
 | `phase 3 — testability` | `src/scoring.ts`, seed functions in `src/state.ts` made pure, `*.test.ts`, vitest config | Extract scoring and seed logic into pure, directly-testable functions; add unit tests | phase 2 module boundaries (scoring/state must already be separated) | pending |
 | `phase 4 — polish and verify` | manual verification pass, readability review, structure doc (`CLAUDE.md` project-specific section or `docs/architecture.md`) | Confirm behavioral equivalence, confirm module boundaries are meaningful, document structure for future contributors | phase 3 complete | pending |
 
@@ -25,7 +25,7 @@ None block phase 1 (resolved — see Big decisions). Phase 2's state-boundary sh
 ## Branches
 
 - `feature/quantum-life-refactor-scaffold` — phase 1 (done), PR [#1](https://github.com/joshstella/quantum-game/pull/1), merged into `main` as `289e849`.
-- `feature/quantum-life-refactor-extract-core` — phase 2 (created this session)
+- `feature/quantum-life-refactor-extract-core` — phase 2 (done), PR [#2](https://github.com/joshstella/quantum-game/pull/2), merged into `main` as `2409f3f`.
 - Later phases branch via `/next-brief-phase` as each completes.
 
 ## Big decisions
