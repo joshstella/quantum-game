@@ -48,11 +48,30 @@ because…" in the PR, not a silent gap.
 
 ## Project-specific
 
-<!-- Add stack, build commands, architecture notes, and project-specific rules here. -->
+**Stack:** Vite + TypeScript, no framework. `strict: true`, no test-runner-specific
+tsconfig split — `vitest` picks up the same `tsconfig.json`.
 
 ```bash
-# Example — replace with real commands:
-# npm run dev      # dev server
-# npm test         # test suite
-# npm run build    # production build
+npm run dev        # dev server (Vite)
+npm run build       # tsc -b && vite build
+npm run typecheck   # tsc -b --noEmit
+npm run test        # vitest run
 ```
+
+**Module layout** (`src/`), a `quantum-life.html` single-file prototype split into typed
+modules — see `docs/briefs/0002-quantum-life-structured-refactor/`:
+
+- `types.ts` — `Mode`, `FieldState`. `FieldState` is the single explicit boundary object
+  every other module below takes as a parameter, rather than closing over shared globals.
+- `state.ts` — allocates `FieldState`, plus `clear`/`seedRing`/`seedInterf`/`seedPacket`.
+- `engine.ts` — `applyH`/`step`, the Schrödinger-style symplectic update.
+- `rendering.ts` — `createRenderer(canvas, state)`, canvas draw + hue-for-phase mapping.
+- `scoring.ts` — pure `computeScore(state): ScoreResult` (ring coherence, held-state %).
+  No DOM access — this is what makes it directly unit-testable.
+- `ui.ts` — pointer/button wiring, the RAF loop, and `score()` (a thin wrapper that calls
+  `computeScore` and writes the result to the DOM).
+- `main.ts` — composition root: `createFieldState()` then `initApp(state)`.
+
+A module that needs a contract shared across boundaries exports it from `types.ts`
+(`FieldState`); a module whose contract is local to its own output defines it itself
+(`Renderer` in `rendering.ts`, `ScoreResult` in `scoring.ts`).
