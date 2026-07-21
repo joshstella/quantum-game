@@ -9,7 +9,7 @@
 |---|---|---|---|---|
 | `phase 1 — scaffold` | `package.json`, `tsconfig.json`, `vite.config.ts`, `index.html`, `src/main.ts`, `src/styles.css` | Stand up Vite + TypeScript project; move existing HTML/CSS/JS in as-is, no behavior change, single entry file | — | done (PR [#1](https://github.com/joshstella/quantum-game/pull/1)) |
 | `phase 2 — extract core behavior` | `src/types.ts`, `src/state.ts`, `src/engine.ts`, `src/rendering.ts`, `src/ui.ts` | Split field state, `step`/`applyH`, canvas rendering, and control/UI wiring out of `main.ts` into typed modules | phase 1 scaffold exists | done (PR [#2](https://github.com/joshstella/quantum-game/pull/2)) |
-| `phase 3 — testability` | `src/scoring.ts`, `src/scoring.test.ts`, `src/state.test.ts`, `vitest.config.ts`, `package.json` | Extract scoring math into a pure `computeScore(state): ScoreResult`; `ui.ts` becomes a thin DOM-writing wrapper; add unit tests for scoring and seeds | phase 2 module boundaries (scoring/state must already be separated) | in-progress |
+| `phase 3 — testability` | `src/scoring.ts`, `src/scoring.test.ts`, `src/state.test.ts`, `vitest.config.ts`, `package.json` | Extract scoring math into a pure `computeScore(state): ScoreResult`; `ui.ts` becomes a thin DOM-writing wrapper; add unit tests for scoring and seeds | phase 2 module boundaries (scoring/state must already be separated) | done (PR [#3](https://github.com/joshstella/quantum-game/pull/3)) |
 | `phase 4 — polish and verify` | manual verification pass, readability review, structure doc (`CLAUDE.md` project-specific section or `docs/architecture.md`) | Confirm behavioral equivalence, confirm module boundaries are meaningful, document structure for future contributors | phase 3 complete | pending |
 
 This is a strict chain, not parallel tracks — each phase's modules are inputs the next phase depends on.
@@ -22,12 +22,13 @@ None block phase 1 (resolved — see Big decisions). Phase 2's state-boundary sh
 
 - The brief's proposed structure doesn't say where the RAF animation loop and seed-button wiring land. Plan: fold both into `src/ui.ts` in phase 2 (they're UI/interaction wiring, not simulation or rendering logic). Confirmed in phase 2 planning — no objection raised, proceeding as planned.
 - Phase 2 already left `state.ts`'s seed functions (`seedRing`/`seedInterf`/`seedPacket`) with zero DOM dependencies — they're already directly unit-testable as-is. Phase 3 found no code change needed there, just test coverage; the "made pure" framing in the original phase-3 row overstated what was left to do.
+- Phase 3's `/review-pr` (PR #3) surfaced two open items, neither blocking, both still unresolved: (1) no test distinguishes "no signal" from "signal but phase-incoherent" in the middle of `computeScore`'s ring-coherence range — existing tests only cover the two extremes; (2) `engine.ts`'s `step`/`applyH` has no unit tests despite being DOM-free, pure numeric logic — out of phase 3's scope as brief-defined, but worth a look if phase 4's "readability review" touches it.
 
 ## Branches
 
 - `feature/quantum-life-refactor-scaffold` — phase 1 (done), PR [#1](https://github.com/joshstella/quantum-game/pull/1), merged into `main` as `289e849`.
 - `feature/quantum-life-refactor-extract-core` — phase 2 (done), PR [#2](https://github.com/joshstella/quantum-game/pull/2), merged into `main` as `2409f3f`.
-- `feature/quantum-life-refactor-testability` — phase 3 (created this session)
+- `feature/quantum-life-refactor-testability` — phase 3 (done), PR [#3](https://github.com/joshstella/quantum-game/pull/3), merged into `main` as `63b2f5c`.
 - Later phases branch via `/next-brief-phase` as each completes.
 
 ## Big decisions
