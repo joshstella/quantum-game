@@ -21,6 +21,7 @@ export function createFieldState(): FieldState {
     frozen: new Uint8Array(SIZE),
     running: true,
     mode: "observe",
+    brushShape: "circle",
     brush: 6,
     stepsPerFrame: 3,
     smoothMax: 1e-3,

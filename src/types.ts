@@ -1,5 +1,10 @@
 export type Mode = "observe" | "collapse" | "source" | "phase";
 
+// Closed set, deliberately not extensible without a code change — see brief #0003's
+// non-goal against a generic shape/plugin system. Only Observe mode honors this; every
+// other mode always uses "circle" regardless of what's selected here.
+export type BrushShape = "circle" | "hline" | "vline" | "square";
+
 // Shared, mutable simulation state — the single explicit boundary that
 // engine/rendering/ui take as a parameter rather than reading module globals.
 export interface FieldState {
@@ -20,6 +25,7 @@ export interface FieldState {
 
   running: boolean;
   mode: Mode;
+  brushShape: BrushShape; // only consulted while mode === "observe"
   brush: number;
   stepsPerFrame: number;
   smoothMax: number; // running peak for auto-brightness
