@@ -7,7 +7,7 @@
 
 | Phase | Files created/modified | Accomplishes | Depends on | Status |
 |---|---|---|---|---|
-| `phase 1 — brush-shape core logic` | `src/types.ts` (`BrushShape`, `FieldState.brushShape`), `src/ui.ts` (mask predicates), `src/tests/*.test.ts` (new) | Add the closed 4-shape union (circle, hline, vline, square outline) and four pure, directly testable mask predicates. No UI changes. | — | in-progress |
+| `phase 1 — brush-shape core logic` | `src/types.ts` (`BrushShape`, `FieldState.brushShape`), `src/ui.ts` (mask predicates), `src/tests/*.test.ts` (new) | Add the closed 4-shape union (circle, hline, vline, square outline) and four pure, directly testable mask predicates. No UI changes. | — | done (PR [#7](https://github.com/joshstella/quantum-game/pull/7)) |
 | `phase 2 — UI wiring and verification` | `src/ui.ts` (button wiring), `index.html` (new control group) | Wire a shape-picker control group into the instrument panel, visible only while Observe mode is active; Playwright verification that Source/Phase tune are unaffected regardless of selected shape | phase 1's mask predicates exist | pending |
 
 Strict chain, not parallel — phase 2 wires UI on top of phase 1's mask predicates.
@@ -23,5 +23,9 @@ None. `src/ui.ts`'s current `forBrush`/`apply` structure (as of `main` at initia
 
 ## Branches
 
-- `feature/observe-brush-shapes-core-logic` — phase 1 (created this session)
-- Phase 2 branches via `/next-brief-phase` once phase 1 completes.
+- `feature/observe-brush-shapes-core-logic` — phase 1 (done), PR [#7](https://github.com/joshstella/quantum-game/pull/7), merged into `main` as `1f5170d`.
+- Phase 2 branches via `/next-brief-phase`.
+
+## Big decisions
+
+- **`apply()` exported for direct testing.** Phase 1's review (`/review-pr` on PR #7) flagged that the mask *predicates* were tested in isolation but the mode-based mask *selection* (observe honors `brushShape`, every other mode forces circle) wasn't — a real gap since that branching logic already existed in the diff, not deferred to phase 2. Resolved by exporting `apply()` from `ui.ts` and adding 3 tests exercising it directly (observe+square, source+square-forced-to-circle, phase+square-forced-to-circle), rather than deferring the gap to phase 2's Playwright-only verification.
