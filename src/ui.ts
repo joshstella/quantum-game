@@ -121,12 +121,27 @@ export function initApp(state: FieldState): void {
   view.addEventListener("pointerup", () => { state.dragging = false; });
   view.addEventListener("pointerleave", () => { state.dragging = false; });
 
+  const shapeButtons = document.querySelectorAll<HTMLButtonElement>("[data-brush-shape]");
+  function updateShapeButtonsAvailability(): void {
+    const enabled = state.mode === "observe";
+    shapeButtons.forEach(b => { b.disabled = !enabled; });
+  }
+
   document.querySelectorAll<HTMLButtonElement>(".mode").forEach(b => {
     b.addEventListener("click", () => {
       document.querySelectorAll(".mode").forEach(m => m.classList.remove("on"));
       b.classList.add("on"); state.mode = b.dataset.mode as Mode;
+      updateShapeButtonsAvailability();
     });
   });
+  shapeButtons.forEach(b => {
+    b.addEventListener("click", () => {
+      shapeButtons.forEach(m => m.classList.remove("on"));
+      b.classList.add("on"); state.brushShape = b.dataset.brushShape as BrushShape;
+    });
+  });
+  updateShapeButtonsAvailability(); // reflects the default mode ("observe") on load
+
   document.querySelectorAll<HTMLButtonElement>("[data-seed]").forEach(b => {
     b.addEventListener("click", () => {
       const s = b.dataset.seed;
