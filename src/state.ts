@@ -1,7 +1,10 @@
 import type { FieldState } from "./types";
 
 const N = 104;
-const CELL = 5;
+// px per simulation cell — display size only, keep in sync with index.html's
+// <canvas id="view"> width/height attributes and styles.css's canvas#view size
+// (N * CELL = 728).
+const CELL = 7;
 const DT = 0.22;
 const SIZE = N * N;
 const cx = N / 2, cy = N / 2;
