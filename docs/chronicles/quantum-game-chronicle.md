@@ -171,37 +171,39 @@ what's there now, and it will have moved on by the time anyone reads this.
 *Costs are estimates suitable for relative attribution across commands and skills, not a
 substitute for the Claude Console's authoritative dollar figures.*
 
-An initial profile, taken after phase one alone, put that opening cycle at $2.49 across 4
-prompts and 79 requests. The figures below supersede it: a final profile of the full
-session that carried the project from bootstrap through brief #0002's close and the
-test-folder cleanup.
+Two earlier profiles preceded this one: $2.49 after phase one alone, then $19.05 after
+brief #0002's close and the test-folder cleanup. Each was accurate at the moment it was
+taken and stale by the next message — a cost figure describes a conversation up to the
+instant it's measured, not a fixed property of the work. The figures below are simply the
+latest snapshot, not a truer final answer than the ones before it.
 
-Session `quantum-game-session1`, window 2026-07-21T21:50:14Z → 23:45:58Z (~2 hours), 16
-prompts, 297 API requests, **$19.05 total estimated cost**. Tokens: 25,124 in · 138,735
-out · 50,945,110 cache-read · 430,326 cache-create.
+Session `quantum-game-session1`, window 2026-07-21T21:50:14Z → 2026-07-22T00:04:24Z (~2.25
+hours), 18 prompts, 347 API requests, **$24.53 total estimated cost**. Tokens: 27,098 in ·
+174,968 out · 66,683,843 cache-read · 486,063 cache-create.
 
-**Where it concentrated.** Three categories accounted for the overwhelming majority of
-spend, and each did real, proportionate work. Unwrapped main-loop construction — writing
-modules, running builds and tests, driving the browser through Playwright, managing git
-and pull requests — came to 49.3% ($9.40). The brief's own re-planning ceremony
+**Where it concentrated.** Unwrapped main-loop construction — writing modules, running
+builds and tests, driving the browser through Playwright, managing git and pull requests,
+diagnosing and fixing the `gather.sh` script — came to 43.2% ($10.76). `review-pr`, run
+before every commit, came to 32.8% ($8.16). The brief's own re-planning ceremony
 (`next-brief-phase`), invoked between each phase to re-read the ledger and confirm or
-revise the remaining sequence, came to 22.6% ($4.31). The correctness-review gate run
-before every commit (`review-pr`) came to 19.3% ($3.68). `chronicle`, `start-brief`,
-`verify`, and `commit-push-pr` itself each stayed under 3%.
+revise the remaining sequence, came to 17.3% ($4.31). `verify`, `chronicle`,
+`start-brief`, `commit-push-pr` itself, and `cost-profiling` each stayed under 3%.
 
-**One finding worth naming.** The re-planning ceremony cost more than the review gate,
-despite running fewer times (three invocations against five). For a brief this size —
-four small phases — the overhead of re-reading the ledger and re-confirming the plan at
-each step was proportionally large next to the size of the code actually changing each
-time. Not wasted spend — it's the discipline that kept each phase honestly scoped — but a
-real cost of the process, not a free one.
+**One finding worth naming, updated from the prior snapshot.** At $19.05, the brief's
+re-planning ceremony had cost more than its review gate. By $24.53 that had reversed:
+`review-pr` grew to nearly a third of total spend, driven by the extra reviews this
+cleanup-and-documentation cycle needed (the test-folder move, plus this update itself)
+that `next-brief-phase` never touched, since it only runs between brief phases and none
+were left to run. The lesson isn't "review costs more than planning" in general — it's
+that which category dominates shifts with what kind of work is actually happening, and a
+single snapshot can mislead about the steady-state ratio.
 
 **main vs. subagent.** No subagents were used across the entire session — 100% of cost
-sits under `main`. Everything ran single-threaded across roughly two hours and sixteen
-prompts. Reasonable at this project's scale.
+sits under `main`. Everything ran single-threaded across the full 2.25 hours. Reasonable
+at this project's scale.
 
-**Cache health.** Excellent throughout: cache-read (50.9M tokens) outnumbered fresh input
-(25K) by roughly two thousand to one, with no sign of the conversation's length forcing
-repeated full-context reloads even as it grew across sixteen prompts.
+**Cache health.** Excellent throughout: cache-read (66.7M tokens) outnumbered fresh input
+(27K) by roughly 2,500 to one, with no sign of the conversation's length forcing repeated
+full-context reloads even as it grew across eighteen prompts.
 
 <!-- chronicle:closed-through:2026-07-21 -->
