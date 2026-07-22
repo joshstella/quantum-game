@@ -8,14 +8,14 @@
 | Phase | Files created/modified | Accomplishes | Depends on | Status |
 |---|---|---|---|---|
 | `phase 1 — brush-shape core logic` | `src/types.ts` (`BrushShape`, `FieldState.brushShape`), `src/ui.ts` (mask predicates), `src/tests/*.test.ts` (new) | Add the closed 4-shape union (circle, hline, vline, square outline) and four pure, directly testable mask predicates. No UI changes. | — | done (PR [#7](https://github.com/joshstella/quantum-game/pull/7)) |
-| `phase 2 — UI wiring and verification` | `src/ui.ts` (button wiring), `index.html` (new control group) | Wire a shape-picker control group into the instrument panel, visible only while Observe mode is active; Playwright verification that Source/Phase tune are unaffected regardless of selected shape | phase 1's mask predicates exist | pending |
+| `phase 2 — UI wiring and verification` | `src/ui.ts` (button wiring), `index.html` (new control group), `src/styles.css` (disabled-button style) | Wire a shape-picker control group into the instrument panel, always visible but disabled/greyed out unless Observe mode is active; Playwright verification that Source/Phase tune are unaffected regardless of selected shape | phase 1's mask predicates exist | in-progress |
 
 Strict chain, not parallel — phase 2 wires UI on top of phase 1's mask predicates.
 
 ## Open decisions
 
 - **"etc." (more shapes than 4)** — the brief scoped this closed at authoring time (circle, hline, vline, square outline only). Treated as settled; not blocking either phase. Flag if this should reopen.
-- **UI placement — blocks phase 2 only.** Hidden-when-not-Observe (brief's proposed default) vs. always-visible-but-disabled. Phase 1 has no UI surface, so it isn't blocked. Must resolve before phase 2 starts.
+- **UI placement — resolved.** The control group is always visible, disabled/greyed out (not `pointer-events` inert — real `disabled` attribute) when Observe isn't the active mode. This reverses the brief's proposed default (hidden-when-not-Observe) per explicit user choice during `/next-brief-phase` planning: more discoverable, at the cost of one disabled control group in 3 of 4 modes. The group's label includes "(Observe)" to explain the disabled state without new tooltip infrastructure.
 
 ## Complications found
 
