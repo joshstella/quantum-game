@@ -71,7 +71,9 @@ export function apply(state: FieldState, gx: number, gy: number): void {
   }
 }
 
-function collapseAt(state: FieldState, gx: number, gy: number): void {
+// Exported for brief #0005's demo runner, which drives the exact same
+// destructive-measurement code path a real Collapse click would.
+export function collapseAt(state: FieldState, gx: number, gy: number): void {
   // destructive projective measurement: sample one outcome weighted by |psi|^2,
   // localise there, annihilate the rest of the looked-at region.
   // Always circular — collapse isn't Observe, so it's outside brief #0003's scope.
