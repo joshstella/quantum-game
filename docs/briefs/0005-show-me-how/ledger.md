@@ -29,3 +29,7 @@ None new. `ui.ts`'s `apply()` is already exported (from brief #0003); `collapseA
 
 - `feature/show-me-how-demo-logic` — phase 1 (created this session)
 - Phases 2–3 branch via `/next-brief-phase` as each completes.
+
+## Big decisions
+
+- **`demo.ts` uses dependency injection, not a direct `ui.ts` import.** The brief's "Proposed design" said `demo.ts` calls `apply()`/`collapseAt()` directly. Implementing it that way would create a circular import once phase 2's `ui.ts` runner needs to import `demo.ts` (`demo.ts → ui.ts → demo.ts`) — a real bug the brief didn't anticipate. Resolved during phase 1's `/review-pr`: `demo.ts` defines a `DemoActions` interface (`{ apply, collapseAt }`) and each `DemoPhase.tick()` takes it as a parameter; `ui.ts`'s phase-2 runner will pass its own local functions straight through, with no import from `demo.ts` back into `ui.ts`'s dependency graph. `demo.ts` stays fully decoupled from `ui.ts`.
