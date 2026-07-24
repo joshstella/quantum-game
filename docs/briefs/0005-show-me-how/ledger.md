@@ -25,6 +25,17 @@ Neither is revisited unless review flags it.
 
 None new. `ui.ts`'s `apply()` is already exported (from brief #0003); `collapseAt` is not yet exported and phase 1 adds that export — a direct, low-risk extension of the same pattern brief #0003 established.
 
+## Big decisions
+
+- **Phase 1 deviated from the brief's literal `tick(state, tickIndex)` signature.** The brief's
+  "Proposed design" had phases call `ui.ts`'s `apply()`/`collapseAt()` directly; the merged
+  implementation instead threads them in via an injected `DemoActions` (`tick(state, tickIndex,
+  actions)`). Reason: `demo.ts` importing `ui.ts` directly would create a circular import once
+  phase 2's `ui.ts` runner needs to import `demo.ts` to drive the button. This was surfaced in
+  PR #10's description but not recorded here until this review — added now so the ledger is the
+  accurate source of truth. Phase 2's runner must pass `{ apply, collapseAt }` from `ui.ts` into
+  each phase's `tick()`, not call phases expecting a two-argument signature.
+
 ## Branches
 
 - `feature/show-me-how-demo-logic` — phase 1 (created this session)
