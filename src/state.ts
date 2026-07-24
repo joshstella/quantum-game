@@ -1,17 +1,19 @@
 import type { FieldState } from "./types";
 
-const N = 104;
-// px per simulation cell — display size only, keep in sync with index.html's
-// <canvas id="view"> width/height attributes and styles.css's canvas#view size
-// (N * CELL = 728).
-const CELL = 7;
+const N = 208; // brief #0007: doubled from 104 to stay crisp at the panel-matched display size
 const DT = 0.22;
 const SIZE = N * N;
 const cx = N / 2, cy = N / 2;
-const RING_R = 30;
-const RING_W = 2.4;
+const RING_R = 60; // brief #0007: doubled alongside N to keep the ring's on-screen proportions
+const RING_W = 4.8;
 
-export function createFieldState(): FieldState {
+// stageSizePx is the canvas's actual rendered size in CSS pixels — measured at
+// startup from the panel's height (main.ts), since the stage now matches the
+// panel rather than a fixed constant. CELL (px per simulation cell) is derived
+// from it here, once, since FieldState.CELL is readonly. The 728 default only
+// serves callers with no DOM to measure (tests, and any non-browser context).
+export function createFieldState(stageSizePx: number = 728): FieldState {
+  const CELL = stageSizePx / N;
   return {
     N, CELL, DT, SIZE, cx, cy, RING_R, RING_W,
     R: new Float32Array(SIZE),

@@ -9,7 +9,7 @@ export type BrushShape = "circle" | "hline" | "vline" | "square";
 // engine/rendering/ui take as a parameter rather than reading module globals.
 export interface FieldState {
   readonly N: number; // grid cells per side
-  readonly CELL: number; // display px per cell (N*CELL = 520)
+  readonly CELL: number; // display px per cell; N*CELL = the stage's rendered size (brief #0007: matches the panel's height, measured at startup — not a fixed constant)
   readonly DT: number; // evolution step
   readonly SIZE: number;
   readonly cx: number;

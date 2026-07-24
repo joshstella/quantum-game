@@ -107,7 +107,9 @@ const COLLAPSE_PHASE_INDEX = 2;
 // Roughly 1.4x RING_R (state.ts): wide enough to knock the ring's coherence
 // down by about half (a local, default-size brush only dents it a few
 // points; the full ring diameter wipes it to ~0, which read as too extreme).
-const DEMO_COLLAPSE_BRUSH = 42;
+// Scaled alongside RING_R's brief #0007 doubling (30→60) to keep the same
+// relative effect: 42→84.
+const DEMO_COLLAPSE_BRUSH = 84;
 
 interface DemoRunner {
   active: boolean;

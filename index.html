@@ -10,8 +10,8 @@
   <div class="stage">
     <h1>Observers</h1>
     <p class="sub">Brightness = amplitude · Hue = phase. Watch the field flow, then hold it into shape.</p>
-    <!-- 728 = N (104, src/state.ts) * CELL (7, src/state.ts) — keep all three in sync -->
-    <canvas id="view" width="728" height="728"></canvas>
+    <!-- width/height set by main.ts at startup, matched to .panel's rendered height (brief #0007) -->
+    <canvas id="view"></canvas>
     <div id="demoCaption" class="demo-caption" hidden></div>
     <div id="demoPopup" class="demo-popup" hidden>
       <p>The ring is fully frozen — ring coherence is holding at <span id="demoPopupPct" class="val"></span>.
