@@ -64,6 +64,10 @@ modules — see `docs/briefs/0002-quantum-life-structured-refactor/`:
 - `types.ts` — `Mode`, `FieldState`. `FieldState` is the single explicit boundary object
   every other module below takes as a parameter, rather than closing over shared globals.
 - `state.ts` — allocates `FieldState`, plus `clear`/`seedRing`/`seedInterf`/`seedPacket`.
+  `createFieldState(stageSizePx)` derives `CELL` (px per grid cell) from the caller-supplied
+  stage size rather than a fixed constant, since `CELL` is `readonly` and can only be set
+  once, at construction — `stageSizePx` defaults to 728 for callers with no DOM to measure
+  (tests, any non-browser context).
 - `engine.ts` — `applyH`/`step`, the Schrödinger-style symplectic update.
 - `rendering.ts` — `createRenderer(canvas, state)`, canvas draw + hue-for-phase mapping.
 - `scoring.ts` — pure `computeScore(state): ScoreResult` (ring coherence, held-state %).
@@ -77,7 +81,9 @@ modules — see `docs/briefs/0002-quantum-life-structured-refactor/`:
   `computeScore` and writes the result to the DOM), and the "Show me how" demo runner
   (steps through `demo.ts`'s phases on the same RAF loop, driving the same
   `apply()`/`collapseAt()` a real drag would — never a separate simulated result).
-- `main.ts` — composition root: `createFieldState()` then `initApp(state)`.
+- `main.ts` — composition root: measures `.panel`'s rendered height, sizes the canvas to
+  match (the stage scales to the panel, not a fixed constant), then
+  `createFieldState(stageSizePx)` and `initApp(state)`.
 
 A module that needs a contract shared across boundaries exports it from `types.ts`
 (`FieldState`); a module whose contract is local to its own output defines it itself
