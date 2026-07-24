@@ -12,6 +12,12 @@
     <p class="sub">Brightness = amplitude · Hue = phase. Watch the field flow, then hold it into shape.</p>
     <!-- 728 = N (104, src/state.ts) * CELL (7, src/state.ts) — keep all three in sync -->
     <canvas id="view" width="728" height="728"></canvas>
+    <div id="demoCaption" class="demo-caption" hidden></div>
+    <div id="demoPopup" class="demo-popup" hidden>
+      <p>The ring is fully frozen — ring coherence is holding at <span id="demoPopupPct" class="val"></span>.
+      Collapsing performs a hard, destructive measurement: coherence takes a serious hit across a wide stretch of the ring.</p>
+      <button id="demoPopupContinue" class="wide">Collapse now →</button>
+    </div>
   </div>
 
   <div class="panel">
@@ -77,6 +83,7 @@
         <b>Observe · Zeno</b> and drag around the dashed target to pin the winding in place — the score climbs.
         Then try one hard <b>Collapse</b> click and watch coherence die where you looked.
       </p>
+      <button id="showMeHow" class="wide" style="margin-top:10px">▶ Show me how</button>
     </div>
   </div>
 

@@ -44,7 +44,7 @@ export function createDemoPhases(): DemoPhase[] {
       },
     },
     {
-      caption: "One destructive Collapse: a hard measurement destroys coherence where you look — watch the score fall.",
+      caption: "One destructive Collapse: a hard measurement destroys coherence right where you look — watch the score fall hard.",
       ticks: 1,
       tick(state, _tickIndex, actions) {
         state.mode = "collapse";
