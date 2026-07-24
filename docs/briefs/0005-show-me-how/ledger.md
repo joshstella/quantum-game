@@ -1,6 +1,6 @@
 # Ledger — #0005 Add a "Show me how" self-playing demo with explanatory captions
 
-**Status:** in-progress
+**Status:** completed
 **Date:** 2026-07-24
 
 ## Phase sequence — strict chain
@@ -9,9 +9,9 @@
 |---|---|---|---|---|
 | `phase 1 — demo script core logic` | `src/demo.ts` (new), `src/ui.ts` (export `collapseAt`), `src/tests/demo.test.ts` (new) | DOM-free `DemoPhase[]` sequence (seed vortex ring → freeze cells along the ring via `apply()` → one `collapseAt()`), directly unit tested | — | done (PR #10, merged 2026-07-24) |
 | `phase 2 — UI wiring` | `src/ui.ts` (demo runner), `index.html` (button + caption overlay + confirm popup), `src/styles.css` (overlay + popup styling), `src/demo.ts` (caption wording) | Wire the "Show me how" button, canvas caption overlay synced to phase changes, per-phase minimum dwell, a blocking pre-Collapse confirmation popup, a demo-only widened collapse brush, disable all other controls while the demo plays, cancel + fully reset state on any real canvas `pointerdown` | phase 1's `DemoPhase[]` must exist | done (PR #11, merged 2026-07-24) |
-| `phase 3 — polish and verify` | full-suite verification, `CLAUDE.md` (module layout) | Scripted Playwright pass covering the full sequence *including the popup confirmation click and cancel-while-popup-is-open*; readability pass over `demo.ts` and the now-larger `ui.ts` runner (pacing/popup/brush-override logic); document `demo.ts` in `CLAUDE.md` | phase 2 complete | in-progress |
+| `phase 3 — polish and verify` | `src/ui.ts` (readability), `src/demo.ts` (comment fix), `CLAUDE.md` (module layout) | Scripted Playwright pass covering the full sequence including the popup confirmation click and cancel-while-popup-is-open (16/16, ad hoc — not committed, matching this project's existing verification convention); readability pass extracting `fireDemoTick()`; documented `demo.ts`/`ui.ts`'s demo runner in `CLAUDE.md` | phase 2 complete | done (PR #12, merged 2026-07-24) |
 
-Strict chain, not parallel — each phase builds directly on the prior. Sequence unchanged by phases 1–2: both big decisions below (DI, and the non-autoplaying confirmation pause) are implementation details that refine phase 3's Playwright coverage — they don't split, reorder, or add a phase.
+Strict chain, not parallel — each phase built directly on the prior. Sequence held as originally planned once re-scoped after phases 1–2: both big decisions below (DI, and the non-autoplaying confirmation pause) turned out to be implementation details that refined phase 3's Playwright coverage rather than reasons to split, reorder, or add a phase.
 
 ## Open decisions
 
@@ -29,7 +29,7 @@ None new. `ui.ts`'s `apply()` is already exported (from brief #0003); `collapseA
 
 - `feature/show-me-how-demo-logic` — phase 1, merged via PR #10.
 - `feature/show-me-how-ui-wiring` — phase 2, merged via PR #11.
-- `feature/show-me-how-polish-verify` — phase 3 (created this session).
+- `feature/show-me-how-polish-verify` — phase 3, merged via PR #12.
 
 ## Big decisions
 
