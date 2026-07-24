@@ -1,13 +1,13 @@
 # Ledger — #0007 Scale the stage to match the panel's height, doubling grid resolution
 
-**Status:** initiated
+**Status:** in-progress
 **Date:** 2026-07-24
 
 ## Phase sequence — strict chain
 
 | Phase | Files created/modified | Accomplishes | Depends on | Status |
 |---|---|---|---|---|
-| `phase 1 — core sizing` | `src/main.ts` (measure `.panel` height, size the canvas, pass size into `createFieldState`), `src/state.ts` (`N` 104→208, `CELL` computed from the passed size instead of a fixed constant, `RING_R` 30→60, `RING_W` 2.4→4.8), `src/types.ts` (fix stale `CELL` doc comment), `index.html` (drop hardcoded canvas width/height + sync comment), `src/styles.css` (drop fixed `canvas#view` size), `src/ui.ts` (`DEMO_COLLAPSE_BRUSH` 42→84) | Stage renders at the panel's actual rendered height (measured once at startup, not hardcoded), grid resolution doubled to stay crisp at the larger size, ring geometry and the brief #0005 demo's collapse brush scaled to match | — | in-progress |
+| `phase 1 — core sizing` | `src/main.ts` (measure `.panel` height, size the canvas, pass size into `createFieldState`), `src/state.ts` (`N` 104→208, `CELL` computed from the passed size instead of a fixed constant, `RING_R` 30→60, `RING_W` 2.4→4.8), `src/types.ts` (fix stale `CELL` doc comment), `index.html` (drop hardcoded canvas width/height + sync comment), `src/styles.css` (drop fixed `canvas#view` size), `src/ui.ts` (`DEMO_COLLAPSE_BRUSH` 42→84) | Stage renders at the panel's actual rendered height (measured once at startup, not hardcoded), grid resolution doubled to stay crisp at the larger size, ring geometry and the brief #0005 demo's collapse brush scaled to match | — | done (PR #13, merged 2026-07-24) |
 | `phase 2 — polish and verify` | full-suite verification, `CLAUDE.md` (module layout, if warranted) | Typecheck/build/test pass; ad-hoc Playwright/manual pass confirming the canvas matches the panel's height, the target-ring overlay aligns with the actual ring, brief #0005's demo still plays correctly at the new geometry, and frame time stays smooth | phase 1 complete | pending |
 
 Strict chain — phase 2 verifies what phase 1 builds.
@@ -24,8 +24,9 @@ Strict chain — phase 2 verifies what phase 1 builds.
 - `src/types.ts:12` — `CELL`'s doc comment already said "N*CELL = 520", stale since brief #0004 changed the actual product to 728. Pre-existing bug, unrelated to this brief's cause, fixed as a drive-by while phase 1 touches this exact area anyway.
 - `CELL` is `readonly` on `FieldState` (`types.ts`) — it can only be set once, at construction. This is why the panel must be measured *before* `createFieldState()` runs, not after: `main.ts` becomes responsible for the measure-then-construct ordering, rather than `state.ts` computing `CELL` some other way.
 - `.panel`'s rendered height is independent of `.stage`'s height today — `body`'s `align-items:flex-start` (styles.css) overrides the flexbox default `stretch`, so sizing the canvas to match the panel won't create a layout feedback loop. Confirmed by reading the CSS, not assumed.
+- Found and fixed during phase 1's `/review-pr`: `getBoundingClientRect().height` returns a float, but canvas `width`/`height` attributes truncate to an integer on assignment — using the raw float for `CELL`'s derivation while the canvas itself ends up truncated meant the two were based on very slightly different numbers. `main.ts` now rounds once, explicitly, before either use.
 
 ## Branches
 
-- `feature/stage-scale-to-panel-height-core-sizing` — phase 1 (created this session).
-- Phase 2 branches via `/next-brief-phase` once phase 1 completes.
+- `feature/stage-scale-to-panel-height-core-sizing` — phase 1, merged via PR #13.
+- Phase 2 branches via `/next-brief-phase`.
