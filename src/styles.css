@@ -59,3 +59,19 @@ input[type=range]{width:100%; accent-color:var(--accent)}
 .meter i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--accent),var(--good))}
 .hint{font-size:11.5px; color:var(--dim); line-height:1.45}
 .hint b{color:#c3cbe0; font-weight:600}
+.demo-caption{
+  position:absolute; left:14px; right:14px; bottom:14px;
+  background:rgba(10,11,16,.82); border:1px solid var(--line); border-radius:10px;
+  padding:10px 14px; font-size:12.5px; line-height:1.45; color:var(--ink);
+  pointer-events:none; /* overlay must never intercept canvas pointer events */
+}
+.demo-caption[hidden]{display:none}
+.demo-popup{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:300px; max-width:80%; z-index:1;
+  background:rgba(15,17,26,.96); border:1px solid var(--line); border-radius:14px;
+  padding:18px 20px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.6);
+  pointer-events:auto; /* unlike .demo-caption, this one must catch its own button click */
+}
+.demo-popup[hidden]{display:none}
+.demo-popup p{margin:0 0 14px; font-size:13px; line-height:1.5; color:var(--ink)}
