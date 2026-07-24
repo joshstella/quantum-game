@@ -195,6 +195,10 @@ export function initApp(state: FieldState): void {
   const speedEl = document.getElementById("speed") as HTMLInputElement, spVal = document.getElementById("spVal") as HTMLElement;
   speedEl.addEventListener("input", () => { state.stepsPerFrame = +speedEl.value; spVal.textContent = String(state.stepsPerFrame); });
 
+  // --- "Show me how" demo runner (brief #0005) ---
+  // Steps through demo.ts's DemoPhase[] on the same RAF loop as real gameplay,
+  // driving apply()/collapseAt() above — never a separate simulated result.
+  const demoActions = { apply, collapseAt };
   const demoBtn = document.getElementById("showMeHow") as HTMLButtonElement;
   const demoCaption = document.getElementById("demoCaption") as HTMLElement;
   const demoPopup = document.getElementById("demoPopup") as HTMLElement;
@@ -227,6 +231,21 @@ export function initApp(state: FieldState): void {
     if (!disabled) updateShapeButtonsAvailability(); // re-gate by mode rather than force-enable
   }
 
+  // collapseAt() reads state.brush; widen it just for the collapse phase's
+  // tick so it spans the whole ring (a local, default-size brush only dents
+  // the ring's aggregate coherence score by a few points — not dramatic).
+  // Restored immediately after, so it never leaks into real gameplay.
+  function fireDemoTick(phase: DemoPhase): void {
+    if (demo.phaseIndex !== COLLAPSE_PHASE_INDEX) {
+      phase.tick(state, demo.tickIndex, demoActions);
+      return;
+    }
+    const realBrush = state.brush;
+    state.brush = DEMO_COLLAPSE_BRUSH;
+    phase.tick(state, demo.tickIndex, demoActions);
+    state.brush = realBrush;
+  }
+
   function runDemoTick(): void {
     const phase = demo.phases[demo.phaseIndex];
     demoCaption.textContent = phase.caption; // shows before the phase's first tick fires, so its action isn't a surprise
@@ -236,17 +255,7 @@ export function initApp(state: FieldState): void {
     // Phase 0 is exempt: nothing precedes it, so its tick fires immediately.
     const readyForFirstTick = demo.phaseIndex === 0 || demo.phaseFrameCount >= DEMO_MIN_PHASE_FRAMES;
     if (demo.tickIndex < phase.ticks && (demo.tickIndex > 0 || readyForFirstTick)) {
-      if (demo.phaseIndex === COLLAPSE_PHASE_INDEX) {
-        // collapseAt() reads state.brush; widen it just for this one call so the
-        // collapse spans the whole ring (a local, default-size brush only dents
-        // the ring's aggregate coherence score by a few points — not dramatic).
-        const realBrush = state.brush;
-        state.brush = DEMO_COLLAPSE_BRUSH;
-        phase.tick(state, demo.tickIndex, { apply, collapseAt });
-        state.brush = realBrush;
-      } else {
-        phase.tick(state, demo.tickIndex, { apply, collapseAt });
-      }
+      fireDemoTick(phase);
       syncModeButtonUI(); // phase.tick() can change state.mode directly; keep the buttons live, not just on end
       demo.tickIndex++;
     }

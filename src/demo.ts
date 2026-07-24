@@ -2,10 +2,10 @@ import type { FieldState } from "./types";
 import { seedRing } from "./state";
 
 // Deliberately decoupled from ui.ts: demo.ts never imports it, and never
-// will — ui.ts's phase-2 runner will need to import demo.ts to drive the
-// "Show me how" button, and demo.ts importing ui.ts back would be a cycle.
-// apply()/collapseAt() are supplied here instead, so the runner can pass its
-// own local functions straight through.
+// will — ui.ts's demo runner imports demo.ts to drive the "Show me how"
+// button, and demo.ts importing ui.ts back would be a cycle. apply()/
+// collapseAt() are supplied here instead, so the runner passes its own
+// local functions straight through.
 export interface DemoActions {
   apply(state: FieldState, gx: number, gy: number): void;
   collapseAt(state: FieldState, gx: number, gy: number): void;
