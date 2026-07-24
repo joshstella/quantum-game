@@ -1,17 +1,17 @@
 # Ledger — #0005 Add a "Show me how" self-playing demo with explanatory captions
 
-**Status:** initiated
-**Date:** 2026-07-23
+**Status:** in-progress
+**Date:** 2026-07-24
 
 ## Phase sequence — strict chain
 
 | Phase | Files created/modified | Accomplishes | Depends on | Status |
 |---|---|---|---|---|
-| `phase 1 — demo script core logic` | `src/demo.ts` (new), `src/ui.ts` (export `collapseAt`), `src/tests/demo.test.ts` (new) | DOM-free `DemoPhase[]` sequence (seed vortex ring → freeze cells along the ring via `apply()` → one `collapseAt()`), directly unit tested | — | in-progress |
-| `phase 2 — UI wiring` | `src/ui.ts` (demo runner), `index.html` (button + caption overlay), `src/styles.css` (overlay styling, disabled states already exist from #0003) | Wire the "Show me how" button, canvas caption overlay synced to phase changes, disable all other controls while the demo plays, cancel + fully reset state on any real canvas `pointerdown` | phase 1's `DemoPhase[]` must exist | pending |
+| `phase 1 — demo script core logic` | `src/demo.ts` (new), `src/ui.ts` (export `collapseAt`), `src/tests/demo.test.ts` (new) | DOM-free `DemoPhase[]` sequence (seed vortex ring → freeze cells along the ring via `apply()` → one `collapseAt()`), directly unit tested | — | done (PR #10, merged 2026-07-24) |
+| `phase 2 — UI wiring` | `src/ui.ts` (demo runner), `index.html` (button + caption overlay), `src/styles.css` (overlay styling, disabled states already exist from #0003) | Wire the "Show me how" button, canvas caption overlay synced to phase changes, disable all other controls while the demo plays, cancel + fully reset state on any real canvas `pointerdown` | phase 1's `DemoPhase[]` must exist | in-progress |
 | `phase 3 — polish and verify` | full-suite verification, `CLAUDE.md` (module layout) | End-to-end Playwright pass including the interrupt/cancel path; readability pass over `demo.ts` and the runner code; document `demo.ts` in `CLAUDE.md` | phase 2 complete | pending |
 
-Strict chain, not parallel — each phase builds directly on the prior.
+Strict chain, not parallel — each phase builds directly on the prior. Sequence unchanged by phase 1: the DI finding (below) is an implementation detail within phase 2's existing scope, not a reason to split or reorder phases.
 
 ## Open decisions
 
@@ -25,21 +25,11 @@ Neither is revisited unless review flags it.
 
 None new. `ui.ts`'s `apply()` is already exported (from brief #0003); `collapseAt` is not yet exported and phase 1 adds that export — a direct, low-risk extension of the same pattern brief #0003 established.
 
-## Big decisions
-
-- **Phase 1 deviated from the brief's literal `tick(state, tickIndex)` signature.** The brief's
-  "Proposed design" had phases call `ui.ts`'s `apply()`/`collapseAt()` directly; the merged
-  implementation instead threads them in via an injected `DemoActions` (`tick(state, tickIndex,
-  actions)`). Reason: `demo.ts` importing `ui.ts` directly would create a circular import once
-  phase 2's `ui.ts` runner needs to import `demo.ts` to drive the button. This was surfaced in
-  PR #10's description but not recorded here until this review — added now so the ledger is the
-  accurate source of truth. Phase 2's runner must pass `{ apply, collapseAt }` from `ui.ts` into
-  each phase's `tick()`, not call phases expecting a two-argument signature.
-
 ## Branches
 
-- `feature/show-me-how-demo-logic` — phase 1 (created this session)
-- Phases 2–3 branch via `/next-brief-phase` as each completes.
+- `feature/show-me-how-demo-logic` — phase 1, merged via PR #10.
+- `feature/show-me-how-ui-wiring` — phase 2 (created this session).
+- Phase 3 branches via `/next-brief-phase` once phase 2 completes.
 
 ## Big decisions
 
