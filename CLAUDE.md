@@ -68,8 +68,15 @@ modules — see `docs/briefs/0002-quantum-life-structured-refactor/`:
 - `rendering.ts` — `createRenderer(canvas, state)`, canvas draw + hue-for-phase mapping.
 - `scoring.ts` — pure `computeScore(state): ScoreResult` (ring coherence, held-state %).
   No DOM access — this is what makes it directly unit-testable.
-- `ui.ts` — pointer/button wiring, the RAF loop, and `score()` (a thin wrapper that calls
-  `computeScore` and writes the result to the DOM).
+- `demo.ts` — `createDemoPhases(): DemoPhase[]`, the "Show me how" self-playing
+  walkthrough's DOM-free phase sequence (seed vortex ring → freeze along the ring →
+  one destructive collapse). Each phase's `tick()` takes an injected `DemoActions`
+  (`{ apply, collapseAt }`) rather than importing `ui.ts` directly — `ui.ts`'s demo
+  runner imports `demo.ts` to drive it, so the reverse import would be a cycle.
+- `ui.ts` — pointer/button wiring, the RAF loop, `score()` (a thin wrapper that calls
+  `computeScore` and writes the result to the DOM), and the "Show me how" demo runner
+  (steps through `demo.ts`'s phases on the same RAF loop, driving the same
+  `apply()`/`collapseAt()` a real drag would — never a separate simulated result).
 - `main.ts` — composition root: `createFieldState()` then `initApp(state)`.
 
 A module that needs a contract shared across boundaries exports it from `types.ts`
