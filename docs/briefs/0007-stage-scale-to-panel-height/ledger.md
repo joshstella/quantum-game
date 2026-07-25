@@ -32,4 +32,4 @@ Strict chain — phase 2 verified what phase 1 built. Phase 3 reopens the brief:
 
 - `feature/stage-scale-to-panel-height-core-sizing` — phase 1, merged via PR #13.
 - `feature/stage-scale-to-panel-height-polish-verify` — phase 2, merged via PR #14.
-- `feature/stage-scale-to-panel-height-seed-patterns` — phase 3 (created this session).
+- `feature/stage-scale-to-panel-height-seed-patterns` — phase 3, merged via PR #18.
