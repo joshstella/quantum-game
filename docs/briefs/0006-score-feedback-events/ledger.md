@@ -1,16 +1,16 @@
 # Ledger — #0006 Add on-screen feedback events when score thresholds are crossed
 
-**Status:** initiated
+**Status:** in-progress
 **Date:** 2026-07-25
 
 ## Phase sequence — strict chain
 
 | Phase | Files created/modified | Accomplishes | Depends on | Status |
 |---|---|---|---|---|
-| `phase 1 — core crossing logic` | `src/scoreEvents.ts` (new), `src/tests/scoreEvents.test.ts` (new) | DOM-free `createScoreEventTracker(): ScoreEventTracker` (`.check(pct): 'up' \| 'down' \| null`) over a fixed threshold list — directly unit testable, no scoring.ts changes | — | done |
-| `phase 2 — UI wiring and verify` | `src/ui.ts` (one tracker instance, feed it the ring % each `score()` call, trigger the flash), `index.html` (flash overlay element), `src/styles.css` (flash animation) | Full-canvas flash fires on real gameplay ring-coherence crossings (and incidentally during brief #0005's demo, since it drives the same scoring code); full-suite verification + ad-hoc Playwright pass | phase 1's tracker must exist | pending |
+| `phase 1 — core crossing logic` | `src/scoreEvents.ts` (new), `src/tests/scoreEvents.test.ts` (new) | DOM-free `createScoreEventTracker(): ScoreEventTracker` (`.check(pct): 'up' \| 'down' \| null`) over a fixed threshold list — directly unit testable, no scoring.ts changes | — | done (PR #16, merged 2026-07-25) |
+| `phase 2 — UI wiring and verify` | `src/ui.ts` (one tracker instance, feed it the ring % each `score()` call, trigger the flash), `index.html` (flash overlay element), `src/styles.css` (flash animation), `CLAUDE.md` (module layout) | Full-canvas flash fires on real gameplay ring-coherence crossings (and incidentally during brief #0005's demo, since it drives the same scoring code); full-suite verification + ad-hoc Playwright pass | phase 1's tracker must exist | in-progress |
 
-Strict chain — phase 2 wires what phase 1 computes.
+Strict chain — phase 2 wires what phase 1 computes. Re-planned scope: phase 1's `/review-pr` flagged that `CLAUDE.md` doesn't yet list `scoreEvents.ts`, unlike `demo.ts`'s precedent (brief #0005 phase 3) — added to phase 2's file list rather than left inconsistent.
 
 ## Open decisions — all resolved before phase 1 branched
 
@@ -33,5 +33,5 @@ Settled as low-stakes implementation defaults (not raised as separate questions)
 
 ## Branches
 
-- `feature/score-feedback-events-core-logic` — phase 1 (created this session).
-- Phase 2 branches via `/next-brief-phase` once phase 1 completes.
+- `feature/score-feedback-events-core-logic` — phase 1, merged via PR #16.
+- `feature/score-feedback-events-ui-wiring` — phase 2 (created this session).
