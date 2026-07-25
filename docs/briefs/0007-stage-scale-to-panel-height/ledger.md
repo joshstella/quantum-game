@@ -1,6 +1,6 @@
 # Ledger — #0007 Scale the stage to match the panel's height, doubling grid resolution
 
-**Status:** in-progress
+**Status:** completed
 **Date:** 2026-07-24
 
 ## Phase sequence — strict chain
@@ -9,7 +9,7 @@
 |---|---|---|---|---|
 | `phase 1 — core sizing` | `src/main.ts` (measure `.panel` height, size the canvas, pass size into `createFieldState`), `src/state.ts` (`N` 104→208, `CELL` computed from the passed size instead of a fixed constant, `RING_R` 30→60, `RING_W` 2.4→4.8), `src/types.ts` (fix stale `CELL` doc comment), `index.html` (drop hardcoded canvas width/height + sync comment), `src/styles.css` (drop fixed `canvas#view` size), `src/ui.ts` (`DEMO_COLLAPSE_BRUSH` 42→84) | Stage renders at the panel's actual rendered height (measured once at startup, not hardcoded), grid resolution doubled to stay crisp at the larger size, ring geometry and the brief #0005 demo's collapse brush scaled to match | — | done (PR #13, merged 2026-07-24) |
 | `phase 2 — polish and verify` | `CLAUDE.md` (module layout) | Typecheck/build/test pass; ad-hoc Playwright pass (12/12, after fixing 2 test-artifact failures unrelated to the app) confirming the canvas matches the panel's height, live frame timing stays well within the 60fps budget (~8.3ms avg, ~9.5ms max), the target-ring overlay aligns with the actual ring, and brief #0005's demo plays correctly end-to-end including both cancel paths at the new geometry | phase 1 complete | done (PR #14, merged 2026-07-24) |
-| `phase 3 — scale the other two seed patterns` | `src/state.ts` (`seedInterf`/`seedPacket` constants) | Revisits phase 1's explicit out-of-scope call: scales `seedInterf`'s ±18 offset / 40 falloff and `seedPacket`'s -24 offset / 70 falloff by the same 2x principle already applied to `RING_R`/`RING_W`, then visually tunes `seedPacket`'s momentum `k` (which doesn't scale the same simple way) | phase 1/2 complete | in-progress |
+| `phase 3 — scale the other two seed patterns` | `src/state.ts` (`seedInterf`/`seedPacket` constants), `src/tests/state.test.ts` (2 tests updated for the new offsets) | Revisited phase 1's explicit out-of-scope call: scaled `seedInterf`'s ±18→±36 offset / 40→160 falloff and `seedPacket`'s -24→-48 offset / 70→280 falloff by the same 2x principle already applied to `RING_R`/`RING_W`; halved `seedPacket`'s momentum `k` (0.9→0.45) since it's radians-per-cell, not a size — the packet's width doubled in grid cells, so halving `k` keeps the same fringe *count* rather than doubling it. Confirmed by before/after screenshot: both patterns now span a footprint comparable to the target ring, not cramped into a fraction of it | phase 1/2 complete | done |
 
 Strict chain — phase 2 verified what phase 1 built. Phase 3 reopens the brief: confirmed by screenshot (not assumed) that phase 1's out-of-scope call needed revisiting — both "Two sources" and "Moving packet" now render visibly smaller/more cramped relative to the canvas and the ring than before the resolution doubling.
 

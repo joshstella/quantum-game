@@ -51,11 +51,14 @@ export function seedRing(state: FieldState): void {
 export function seedInterf(state: FieldState): void {
   clear(state);
   const { N, cx, cy, R } = state;
-  const sources: Array<[number, number]> = [[cx - 18, cy], [cx + 18, cy]];
+  // brief #0007 phase 3: offset and falloff doubled/quadrupled alongside
+  // RING_R/RING_W (r scales 2x, so r² in the falloff scales 4x) — without
+  // this, the pattern renders at roughly half its intended on-screen size.
+  const sources: Array<[number, number]> = [[cx - 36, cy], [cx + 36, cy]];
   for (const [sx, sy] of sources)
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
       const r2 = (x - sx) * (x - sx) + (y - sy) * (y - sy);
-      const g = Math.exp(-r2 / 40);
+      const g = Math.exp(-r2 / 160);
       R[y * N + x] += g; // same phase -> they will interfere
     }
 }
@@ -63,10 +66,15 @@ export function seedInterf(state: FieldState): void {
 export function seedPacket(state: FieldState): void {
   clear(state);
   const { N, cx, cy, R, I } = state;
-  const k = 0.9; // momentum
+  // brief #0007 phase 3: offset/falloff scaled the same way as seedInterf
+  // above. Momentum k halved (0.9→0.45): it's radians of phase per grid
+  // cell, not a size — with the packet's width now doubled in grid cells,
+  // halving k keeps the same number of visible fringes across it rather
+  // than cramming twice as many into the same relative on-screen space.
+  const k = 0.45; // momentum
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-    const r2 = (x - (cx - 24)) * (x - (cx - 24)) + (y - cy) * (y - cy);
-    const g = Math.exp(-r2 / 70);
+    const r2 = (x - (cx - 48)) * (x - (cx - 48)) + (y - cy) * (y - cy);
+    const g = Math.exp(-r2 / 280);
     R[y * N + x] = g * Math.cos(k * x);
     I[y * N + x] = g * Math.sin(k * x);
   }

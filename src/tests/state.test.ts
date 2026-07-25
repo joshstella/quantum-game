@@ -39,8 +39,8 @@ describe("seedInterf", () => {
     const state = createFieldState();
     seedInterf(state);
 
-    const leftIdx = state.cy * state.N + Math.round(state.cx - 18);
-    const rightIdx = state.cy * state.N + Math.round(state.cx + 18);
+    const leftIdx = state.cy * state.N + Math.round(state.cx - 36);
+    const rightIdx = state.cy * state.N + Math.round(state.cx + 36);
 
     expect(magAt(state.R, state.I, leftIdx)).toBeGreaterThan(0.5);
     expect(magAt(state.R, state.I, rightIdx)).toBeGreaterThan(0.5);
@@ -52,7 +52,7 @@ describe("seedPacket", () => {
     const state = createFieldState();
     seedPacket(state);
 
-    const centerIdx = state.cy * state.N + Math.round(state.cx - 24);
+    const centerIdx = state.cy * state.N + Math.round(state.cx - 48);
 
     expect(magAt(state.R, state.I, centerIdx)).toBeGreaterThan(0.5);
   });
