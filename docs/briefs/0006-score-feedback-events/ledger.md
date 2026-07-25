@@ -7,8 +7,8 @@
 
 | Phase | Files created/modified | Accomplishes | Depends on | Status |
 |---|---|---|---|---|
-| `phase 1 — core crossing logic` | `src/scoreEvents.ts` (new), `src/tests/scoreEvents.test.ts` (new) | Pure, DOM-free `detectCrossing(prevPct, currPct): 'up' \| 'down' \| null` over a fixed threshold list — directly unit testable, no scoring.ts changes | — | in-progress |
-| `phase 2 — UI wiring and verify` | `src/ui.ts` (track previous ring %, call `detectCrossing`, trigger the flash), `index.html` (flash overlay element), `src/styles.css` (flash animation) | Full-canvas flash fires on real gameplay ring-coherence crossings (and incidentally during brief #0005's demo, since it drives the same scoring code); full-suite verification + ad-hoc Playwright pass | phase 1's `detectCrossing` must exist | pending |
+| `phase 1 — core crossing logic` | `src/scoreEvents.ts` (new), `src/tests/scoreEvents.test.ts` (new) | DOM-free `createScoreEventTracker(): ScoreEventTracker` (`.check(pct): 'up' \| 'down' \| null`) over a fixed threshold list — directly unit testable, no scoring.ts changes | — | done |
+| `phase 2 — UI wiring and verify` | `src/ui.ts` (one tracker instance, feed it the ring % each `score()` call, trigger the flash), `index.html` (flash overlay element), `src/styles.css` (flash animation) | Full-canvas flash fires on real gameplay ring-coherence crossings (and incidentally during brief #0005's demo, since it drives the same scoring code); full-suite verification + ad-hoc Playwright pass | phase 1's tracker must exist | pending |
 
 Strict chain — phase 2 wires what phase 1 computes.
 
@@ -26,6 +26,10 @@ Settled as low-stakes implementation defaults (not raised as separate questions)
 
 - Verified by direct simulation (not assumed): `renderer.render()`'s `smoothMax` convergence at page load does *not* cause spurious oscillation in ring-coherence % — a freshly-seeded ring's `presence` term clamps to 1 immediately, so the score is stable at 100% from frame 1, not jittering across multiple thresholds during the ~200ms ramp-up.
 - Real complication phase 2 must handle: the very first `score()` call has no prior reading to compare against. `detectCrossing` needs its first call seeded from the current value (establishing the starting bracket) rather than compared against an assumed `0`, or it will fire a spurious flash immediately on every page load.
+
+## Big decisions
+
+- **Phase 1 deviated from the ledger's planned `detectCrossing(prevPct, currPct)` pure function, in favor of a stateful `createScoreEventTracker(): ScoreEventTracker` with a `.check(pct)` method.** The ledger's own "Complications found" flagged that the first call needs its baseline seeded rather than compared against an assumed 0 — a two-arg pure function would leave that discipline up to whichever caller uses it (phase 2's `ui.ts`, and any future caller). The stateful tracker closes this off structurally: `lastBracket` starts as `null` internally, and the first `.check()` call always establishes the baseline and returns `null`, so it's impossible for a caller to get this wrong. Same testability characteristic as the pure-function plan (a sequence of `.check()` calls asserts the same behavior a sequence of `detectCrossing(prev, curr)` calls would), just self-contained. Phase 2's `ui.ts` integration is a single tracker instance fed the ring % each `score()` call, not manual prev/curr tracking.
 
 ## Branches
 
