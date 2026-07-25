@@ -149,20 +149,136 @@ No governing brief covered this — the change was small enough, and mechanical 
 to need one — but it went through the same review gate as every other change before
 reaching `main`.
 
+## Era 8 — two siblings, filed together, finished at very different speeds
+
+With the refactor closed, two small briefs were filed in the same commit: #0003 (Observe
+mode gets selectable brush shapes — circle, horizontal line, vertical line, a hollow
+square outline) and #0004 (enlarge the main canvas display). They shipped on very
+different timelines.
+
+#0004 was mechanical and small enough to need only one phase: bump `CELL` from 5 to 7,
+matching the canvas's HTML attributes and CSS size to the new 728px total, with `N` and
+the underlying simulation grid left untouched. Its one open decision — the target size —
+was settled before phase 1 even started. It shipped the same evening it was filed.
+
+#0003 took longer and produced two real forks. The brief itself proposed the shape
+picker be hidden entirely outside Observe mode; during `/next-brief-phase` planning this
+was reversed in favor of always visible but disabled (greyed out) when a different mode
+was active — more discoverable, at the cost of one disabled control group three-quarters
+of the time, with "(Observe)" added to the group's label to explain the disabled state
+without building tooltip infrastructure. The second fork surfaced in review: phase 1's
+diff already contained the branching logic that keeps Source and Phase tune forced to a
+circular brush regardless of which shape was selected, but only the shape *masks*
+themselves were unit tested, not that mode-based selection. Rather than deferring the gap
+to phase 2's manual verification, `apply()` was exported from `ui.ts` and three tests
+were added exercising the selection logic directly. Both phases shipped by the following
+afternoon.
+
+## Era 9 — a demo that has to prove it isn't cheating
+
+Brief #0005 asked for a "Show me how" button: an autoplaying walkthrough — seed a vortex
+ring, freeze it into coherence via Observe/Zeno, then one destructive Collapse — with
+captions explaining what's happening and why. Its own stated biggest risk was also its
+core design constraint: the demo had to drive the *same* `apply()`/`collapseAt()` code
+paths a real player's drag or click would, never a separate simulated result, or it would
+silently drift out of sync with real gameplay over time.
+
+That constraint produced this brief's first fork before phase 1 even merged. The brief's
+proposed design had `demo.ts` import `apply()`/`collapseAt()` directly from `ui.ts` — but
+`ui.ts`'s own runner would need to import `demo.ts` back to drive the button, a circular
+import the brief hadn't anticipated. Phase 1's review caught it: `demo.ts` instead
+defines a `DemoActions` interface and each phase's `tick()` takes it as a parameter,
+letting `ui.ts` pass its own local functions straight through with no import running the
+other way.
+
+Phase 2 is where the demo stopped being a straightforward wiring exercise. Live testing —
+not planning — surfaced that single-tick phases advanced and finished in the same
+instant, too fast to read; that even once paced out, there was no beat between "ring
+fully frozen" and "collapsed," so the destructive step landed as a surprise rather than
+an explained consequence; and that the collapse itself, at a real player's default brush
+size, barely dented the ring's aggregate coherence score, directly contradicting the
+demo's own caption promising the player should "watch the score fall." Each of these
+became a real decision, not a bug fix: a minimum per-phase dwell was added so no phase
+could resolve faster than a player could read it; the demo's fully-autoplaying framing
+was deliberately broken with one blocking confirmation popup before Collapse — a
+genuine, acknowledged deviation from the brief's own language, arrived at by testing the
+built thing against a real reaction rather than reasoning about it abstractly; and the
+collapse's brush was temporarily widened for the duration of that one tick only, its
+exact value settled by simulating the actual before/after coherence numbers at several
+candidate widths rather than picking one and hoping. Phase 3's Playwright pass, run
+directly against the built demo, confirmed the popup, both cancel paths, and the tuned
+collapse together, then closed with a readability pass and documentation.
+
+## Era 10 — the stage grows, and grows up, twice
+
+Brief #0007 asked the canvas to stop being a fixed 728px square and instead match
+whatever height the side panel actually rendered at — and, since a taller display would
+visibly pixelate the existing 104-cell grid, to double the simulation resolution
+alongside it. Four open decisions were resolved before phase 1 branched, and one of them
+was resolved by measurement rather than argument: doubling the grid was benchmarked
+directly against `engine.ts`'s actual update step before it was trusted, not assumed safe
+because it sounded reasonable.
+
+Reading the code surfaced an architectural constraint the brief hadn't named:
+`FieldState.CELL` is `readonly`, settable only once, at construction — which meant the
+panel's height had to be measured *before* the field state was built, not after,
+reordering what had looked like a simple two-line composition root into a
+measure-then-construct sequence. A second, smaller thing was caught in the same review
+that produced it: `getBoundingClientRect()` returns a float, but a canvas's width/height
+attributes silently truncate to an integer on assignment, so deriving `CELL` from the
+raw float while the canvas itself rounded would have left the two based on very slightly
+different numbers. Phase 1 closed that gap by rounding once, explicitly, before either
+use.
+
+Between #0007's two phases, a smaller and unrelated brief, #0006, ran its own arc. It
+asked for on-screen feedback — a flash — when the ring-coherence score crossed a
+meaningful threshold during real gameplay, not just the demo. The plan called for a
+two-argument pure function, `detectCrossing(prev, curr)`; phase 1 shipped something
+else. Its own filing had already named the risk — a fresh reading has no prior value to
+compare against, and comparing against an assumed zero would fire a false alarm on every
+page load — and a stateful tracker was chosen specifically because it makes that mistake
+structurally impossible rather than trusting every future caller to remember it: the
+first call always seeds a baseline and returns nothing, by construction, not by
+convention. Phase 2's live verification turned up the same finding brief #0005 had
+already hit from a different angle: a single collapse click at a real player's default
+brush barely moves the aggregate coherence metric, so triggering a "down" flash in
+practice needs a wider brush or several clicks — not a bug in the feature, a property of
+how the underlying score responds to a small local disturbance, now documented in two
+places instead of one.
+
+#0007 had been marked complete for less than a day when it reopened. Its own ledger had
+explicitly logged an out-of-scope call: `seedInterf` and `seedPacket`, the game's other
+two seed patterns, kept their old hardcoded offsets and falloffs while the grid around
+them doubled. Asked directly whether that call still held, the answer wasn't argued, it
+was rendered: a screenshot of "Two sources" showed two small dots sitting well inside the
+target ring's outline, and "Moving packet" showed a dense little cluster of fringes,
+both looking cramped rather than proportionate. Phase 3 scaled both patterns' offsets and
+falloffs by the same doubling already applied to the vortex ring's own geometry, then
+made one further call the simple doubling didn't cover: the packet's momentum constant
+is radians of phase per grid cell, not a size, so widening the packet without touching it
+would have crammed twice as many visible fringes into the same relative space — it was
+halved instead, to hold the fringe count steady. A second before/after screenshot
+confirmed the fix before it shipped.
+
 ## Roads not taken
 
-None. `docs/briefs/_drafts/` remains empty — nothing has been proposed and parked. The
-project is young enough that everything raised so far has been built rather than
-deferred.
+None yet. `docs/briefs/_drafts/` remains empty — nothing has been proposed and parked.
+Every brief filed so far, across all seven, has been built rather than deferred; the one
+recurring exception is narrower than a parked draft — a brief explicitly scoping part of
+its own work out (brief #0007's original call to leave `seedInterf`/`seedPacket`
+unscaled), which was itself later revisited and closed rather than left standing.
 
 ## Where things stand now
 
-Brief #0002 is closed. The application now lives as seven small modules under `src/` —
-`types`, `state`, `engine`, `rendering`, `scoring`, `ui`, and the `main` composition root
-— with its tests in `src/tests/`, twelve of them passing, and its structure documented in
-the project's own `CLAUDE.md`. What the codebase looks like today is best read from those
-files directly — this chronicle is the record of how it got there, not a description of
-what's there now, and it will have moved on by the time anyone reads this.
+All seven filed briefs are closed. The application has grown from the four-phase
+refactor's seven modules to include a scripted demo (`demo.ts`), a score-feedback tracker
+(`scoreEvents.ts`), a stage that matches its own side panel rather than a fixed size, and
+a simulation grid twice the resolution it started at — with the vortex ring, the two
+other seed patterns, and the demo's own tuning all re-derived from the same geometry
+rather than left to drift independently. What the codebase looks like today is best read
+from `CLAUDE.md` and the modules themselves; this chronicle is the record of how it got
+there, not a description of what's there now, and it will have moved on by the time
+anyone reads this.
 
 ---
 
@@ -206,4 +322,32 @@ at this project's scale.
 (27K) by roughly 2,500 to one, with no sign of the conversation's length forcing repeated
 full-context reloads even as it grew across eighteen prompts.
 
-<!-- chronicle:closed-through:2026-07-21 -->
+### A third profile, across a much larger cycle
+
+Run `quantum-game-demo` covers the five briefs in Eras 8–10 above, start to finish:
+2026-07-24 through 2026-07-25, thirty-three prompts, 597 API requests, **$70.51 total
+estimated cost**. Tokens: 32,688 in · 292,344 out · 188,653,704 cache-read · 2,515,291
+cache-create.
+
+**Where it concentrated.** Unlike the $24.53 snapshot above, where `review-pr` and
+unwrapped main-loop work were within fifteen points of each other, this run's spend
+split almost the same way in absolute terms but at greater scale: unnamed main-loop
+conversation took 49.1% ($34.59), `review-pr` took 37.9% ($26.75). The review share is
+large but not idle — several of its runs did real investigative work in their own right:
+a direct benchmark of the doubled simulation grid before trusting it was fast enough, a
+simulated walk of `smoothMax`'s startup convergence to rule out a false-alarm flash, and
+the before/after screenshots that settled whether the seed-pattern rescaling was
+actually needed. Two single turns, each driving many rounds of live browser verification
+in place of a scripted, committed test suite, accounted for over a third of the total on
+their own — a cost this project has been paying since its very first Playwright pass in
+Era 3, made visible in dollars for the first time.
+
+**main vs. subagent.** Still no subagents anywhere — 100% of cost sits under `main`,
+consistent with both prior profiles.
+
+**Cache health.** Held steady at a similar order of magnitude: roughly 189 million
+cache-read tokens against about 33 thousand fresh input tokens, even as this
+conversation ran far longer and touched far more of the codebase than either prior
+snapshot.
+
+<!-- chronicle:closed-through:2026-07-25 -->
