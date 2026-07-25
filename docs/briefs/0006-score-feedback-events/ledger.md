@@ -1,6 +1,6 @@
 # Ledger — #0006 Add on-screen feedback events when score thresholds are crossed
 
-**Status:** in-progress
+**Status:** completed
 **Date:** 2026-07-25
 
 ## Phase sequence — strict chain
@@ -8,7 +8,7 @@
 | Phase | Files created/modified | Accomplishes | Depends on | Status |
 |---|---|---|---|---|
 | `phase 1 — core crossing logic` | `src/scoreEvents.ts` (new), `src/tests/scoreEvents.test.ts` (new) | DOM-free `createScoreEventTracker(): ScoreEventTracker` (`.check(pct): 'up' \| 'down' \| null`) over a fixed threshold list — directly unit testable, no scoring.ts changes | — | done (PR #16, merged 2026-07-25) |
-| `phase 2 — UI wiring and verify` | `src/ui.ts` (one tracker instance, feed it the ring % each `score()` call, trigger the flash), `index.html` (flash overlay element), `src/styles.css` (flash animation), `CLAUDE.md` (module layout) | Full-canvas flash fires on real gameplay ring-coherence crossings (and incidentally during brief #0005's demo, since it drives the same scoring code); full-suite verification + ad-hoc Playwright pass | phase 1's tracker must exist | in-progress |
+| `phase 2 — UI wiring and verify` | `src/ui.ts` (one tracker instance, feed it the ring % each `score()` call, trigger the flash), `index.html` (flash overlay element), `src/styles.css` (flash animation), `CLAUDE.md` (module layout) | Full-canvas flash fires on real gameplay ring-coherence crossings (and incidentally during brief #0005's demo, since it drives the same scoring code); full-suite verification + ad-hoc Playwright pass (both directions confirmed from real gameplay, no spurious load-time flash, one incidental flash confirmed during the demo) | phase 1's tracker must exist | done (PR #17, merged 2026-07-25) |
 
 Strict chain — phase 2 wires what phase 1 computes. Re-planned scope: phase 1's `/review-pr` flagged that `CLAUDE.md` doesn't yet list `scoreEvents.ts`, unlike `demo.ts`'s precedent (brief #0005 phase 3) — added to phase 2's file list rather than left inconsistent.
 
@@ -26,6 +26,7 @@ Settled as low-stakes implementation defaults (not raised as separate questions)
 
 - Verified by direct simulation (not assumed): `renderer.render()`'s `smoothMax` convergence at page load does *not* cause spurious oscillation in ring-coherence % — a freshly-seeded ring's `presence` term clamps to 1 immediately, so the score is stable at 100% from frame 1, not jittering across multiple thresholds during the ~200ms ramp-up.
 - Real complication phase 2 must handle: the very first `score()` call has no prior reading to compare against. `detectCrossing` needs its first call seeded from the current value (establishing the starting bracket) rather than compared against an assumed `0`, or it will fire a spurious flash immediately on every page load.
+- Discovered during phase 2's live verification: a single real Collapse click at the default brush size barely dents the ring's aggregate coherence score (same finding as brief #0005/#0007's review of `collapseAt()`'s effect) — not enough to cross even the lowest threshold on its own. A "down" flash in practice needs either a wider brush or several collapse clicks around the ring. Not a bug in this feature; a property of how `scoring.ts`'s aggregate metric responds to a small local disturbance.
 
 ## Big decisions
 
@@ -34,4 +35,4 @@ Settled as low-stakes implementation defaults (not raised as separate questions)
 ## Branches
 
 - `feature/score-feedback-events-core-logic` — phase 1, merged via PR #16.
-- `feature/score-feedback-events-ui-wiring` — phase 2 (created this session).
+- `feature/score-feedback-events-ui-wiring` — phase 2, merged via PR #17.
