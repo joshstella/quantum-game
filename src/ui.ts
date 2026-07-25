@@ -4,6 +4,7 @@ import { step } from "./engine";
 import { createRenderer } from "./rendering";
 import { computeScore } from "./scoring";
 import { createDemoPhases, type DemoPhase } from "./demo";
+import { createScoreEventTracker, type CrossingDirection } from "./scoreEvents";
 
 interface ScoreElements {
   ringScoreEl: HTMLElement;
@@ -122,12 +123,15 @@ interface DemoRunner {
   wasRunning: boolean; // state.running before the demo forced it on, restored after
 }
 
-function score(state: FieldState, els: ScoreElements): void {
+// Returns ringCoherencePct so the caller can feed it to a ScoreEventTracker
+// without recomputing computeScore() a second time.
+function score(state: FieldState, els: ScoreElements): number {
   const { ringCoherencePct, heldPct } = computeScore(state);
   els.ringScoreEl.textContent = ringCoherencePct + "%";
   els.ringBar.style.width = ringCoherencePct + "%";
   els.heldScoreEl.textContent = heldPct + "%";
   els.heldBar.style.width = heldPct + "%";
+  return ringCoherencePct;
 }
 
 export function initApp(state: FieldState): void {
@@ -140,6 +144,18 @@ export function initApp(state: FieldState): void {
     heldScoreEl: document.getElementById("heldScore") as HTMLElement,
     heldBar: document.getElementById("heldBar") as HTMLElement,
   };
+
+  // brief #0006: fires on real gameplay's ring-coherence threshold crossings
+  // (and incidentally during the "Show me how" demo, since it drives this
+  // same score() call — not a separate simulated result, same as the demo's
+  // own reuse of apply()/collapseAt()).
+  const scoreTracker = createScoreEventTracker();
+  const scoreFlash = document.getElementById("scoreFlash") as HTMLElement;
+  function triggerScoreFlash(direction: CrossingDirection): void {
+    scoreFlash.classList.remove("flash-up", "flash-down");
+    void scoreFlash.offsetWidth; // force reflow so re-adding the class restarts the CSS animation even mid-flash
+    scoreFlash.classList.add(direction === "up" ? "flash-up" : "flash-down");
+  }
 
   view.addEventListener("pointerdown", e => {
     // A real interaction always wins over the demo: cancel it and consume
@@ -334,7 +350,11 @@ export function initApp(state: FieldState): void {
       updateCollapseConfirmPopupText();
     }
     renderer.render();
-    if ((state.acc++ % 3) === 0) score(state, els);
+    if ((state.acc++ % 3) === 0) {
+      const ringPct = score(state, els);
+      const crossing = scoreTracker.check(ringPct);
+      if (crossing) triggerScoreFlash(crossing);
+    }
     requestAnimationFrame(frame);
   }
   seedRing(state);
