@@ -77,19 +77,10 @@ modules — see `docs/briefs/0002-quantum-life-structured-refactor/`:
   one destructive collapse). Each phase's `tick()` takes an injected `DemoActions`
   (`{ apply, collapseAt }`) rather than importing `ui.ts` directly — `ui.ts`'s demo
   runner imports `demo.ts` to drive it, so the reverse import would be a cycle.
-- `scoreEvents.ts` — `createScoreEventTracker(): ScoreEventTracker`, a DOM-free
-  `.check(pct)` tracker over a fixed set of ring-coherence thresholds. Reports at most
-  one crossing direction (`"up"`/`"down"`) per call, debounced via discrete brackets
-  rather than a fixed prior value — its first `.check()` call always seeds the
-  starting bracket instead of firing, so a page load never reports a spurious crossing.
 - `ui.ts` — pointer/button wiring, the RAF loop, `score()` (a thin wrapper that calls
-  `computeScore`, writes the result to the DOM, and returns the ring % so the caller can
-  feed a `ScoreEventTracker` without recomputing `computeScore`), a full-canvas flash
-  triggered by that tracker's crossings, and the "Show me how" demo runner (steps
-  through `demo.ts`'s phases on the same RAF loop, driving the same
-  `apply()`/`collapseAt()` a real drag would — never a separate simulated result, and
-  the score flash fires from real gameplay and the demo alike since both go through the
-  same `score()` call).
+  `computeScore` and writes the result to the DOM), and the "Show me how" demo runner
+  (steps through `demo.ts`'s phases on the same RAF loop, driving the same
+  `apply()`/`collapseAt()` a real drag would — never a separate simulated result).
 - `main.ts` — composition root: measures `.panel`'s rendered height, sizes the canvas to
   match (the stage scales to the panel, not a fixed constant), then
   `createFieldState(stageSizePx)` and `initApp(state)`.
