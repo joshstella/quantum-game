@@ -75,18 +75,3 @@ input[type=range]{width:100%; accent-color:var(--accent)}
 }
 .demo-popup[hidden]{display:none}
 .demo-popup p{margin:0 0 14px; font-size:13px; line-height:1.5; color:var(--ink)}
-.score-flash{
-  position:absolute; inset:0; border-radius:14px;
-  pointer-events:none; /* never intercept canvas pointer events, same as .demo-caption */
-  opacity:0;
-}
-.score-flash.flash-up{ animation:score-flash-up .3s ease-out; }
-.score-flash.flash-down{ animation:score-flash-down .3s ease-out; }
-@keyframes score-flash-up{
-  0%{opacity:.35; background:var(--good);}
-  100%{opacity:0; background:var(--good);}
-}
-@keyframes score-flash-down{
-  0%{opacity:.35; background:var(--warn);}
-  100%{opacity:0; background:var(--warn);}
-}
